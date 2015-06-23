@@ -15,6 +15,30 @@ class SystemsController < ApplicationController
     end
   end
 
+  def add_public_vote
+    @user   = current
+    @system = System.find(params[:id])
+    @name   = @system.propsed_names(params[:proposed_name_id])
+
+    if @user and @system and @name
+      @name.add_vote_from_user(@user)
+    else
+      raise ActionController::RoutingError.new('Not Found')
+    end
+  end
+
+  def remove_public_vote
+    @user   = current
+    @system = System.find(params[:id])
+    @name   = @system.propsed_names(params[:proposed_name_id])
+
+    if @user and @system and @name
+      @name.remove_vote_from_user(@user)
+    else
+      raise ActionController::RoutingError.new('Not Found')
+    end
+  end
+
   def remove_club_vote
     if @system = System.find(params[:id]) and (current_club )
       @system.remove_vote_from_club(current_club )
@@ -34,7 +58,7 @@ class SystemsController < ApplicationController
   end
 
   def remove_club_suggestion
-    club = current_club 
+    club = current_club
     if @system = System.find(params[:id]) and club
       @system.remove_club_suggestion(club)
       render :json => @system.to_json
